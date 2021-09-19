@@ -4,14 +4,13 @@ from pathlib import Path
 
 ##A few functions are defined here to aid in ease of presentation of numbers in string output.
 
-
 #This function takes a money amount parameter and rounds it to the penny, and also prints zeros for the pennies place if there are no pennies or an end zero if there are only dimes, and adds a leading dollar sign. The output is returned as a string.
 
 def penny_format(unformatted_amount):
     penny_rounded_format = "${:.2f}".format(round(unformatted_amount, 2))
     return penny_rounded_format
 
-#this function takes a plain decimal format and converts it to a string in percent format, multiplied by a hundred with a percent sign. It removes trailing zeros after a decimal.
+#This function takes a plain decimal format and converts it to a string in percent format, multiplied by a hundred with a percent sign. It removes trailing zeros after a decimal.
 
 def percent_format(decimal_format):
     percent = decimal_format * 100
@@ -19,6 +18,21 @@ def percent_format(decimal_format):
         percent = int(percent)
     percent_formatted = str(percent) + "%"
     return percent_formatted
+
+#This function will print a list of numbers to be added and their sum, but formatted with right justification and a plus sign above the line. It will also format the numbers with dollars signs and print to the penny. If the sum does not match the total, an error will instead be printed.
+
+def money_addition_presentation(addends, total):
+    if sum(addends) != total:
+        print("Error: The sum does not match")
+    else:
+        for addend in addends[:-1]: 
+            print("  " + " "*((len(penny_format(total)))-len(penny_format(addend))) + penny_format(addend))
+        print("+ " + " "*((len(penny_format(total)))-len(penny_format(addends[-1]))) + penny_format(addends[-1]))
+    
+        print("  " + "-" * len(penny_format(total)))
+        print("  " + penny_format(total))
+        
+
 
 
 """Part 1: Automate the Calculations.
@@ -55,20 +69,10 @@ print(f"There total amount of the loans is {penny_format(loan_amount_total)}.")
 average_loan_price = loan_amount_total / total_number_of_loans
 print(f"The average loan price is {penny_format(average_loan_price)}.\n")
 
-#This code prints the previous calculations with descriptive messages and formats it to look like a normal accounting equation.
 print(f"The sum of the {total_number_of_loans} loans:\n")
 
-#code to add spaces at the beginning so the right side lines up and a plus sign appears before the bottom horizontal line. I should make a general function for this.
-for loan in loan_costs[:-1]: 
-    print("  " + " "*((len(penny_format(loan_amount_total)))-len(penny_format(loan))) + penny_format(loan))
-print("+ " + " "*((len(penny_format(loan_amount_total)))-len(penny_format(loan_costs[-1]))) + penny_format(loan_costs[-1]))
-
-print("  " + "-" * len(penny_format(loan_amount_total)))
-print("  " + penny_format(loan_amount_total))
-
-print(f"\nThe total loan amount of {penny_format(loan_amount_total)} divided by {total_number_of_loans} loans equals an average loan price of {penny_format(average_loan_price)}.\n")
-
-
+#This function called prints the previous calculations with descriptive messages and formats it to look like a normal accounting equation.
+money_addition_presentation(loan_costs, loan_amount_total)
 
 
 """Part 2: Analyze Loan Data.
@@ -94,6 +98,8 @@ Using more detailed data on one of these loans, follow these steps to calculate 
     If Present Value represents the loan's fair value (given the required minimum return of 20%), does it make sense to buy the loan at its current cost?
 """
 
+print("\nPart 2: Analyze Loan Data.\n")
+
 # Given the following loan data, you will need to calculate the present value for the loan
 loan = {
     "loan_price": 500,
@@ -101,8 +107,6 @@ loan = {
     "repayment_interval": "bullet",
     "future_value": 1000,
 }
-
-print("Part 2: Analyze Loan Data.\n")
 
 # @TODO: Use get() on the dictionary of additional information to extract the Future Value and Remaining Months on the loan.
 # Print each variable.
@@ -219,7 +223,7 @@ for loan in loans:
         inexpensive_loans.append(loan)
 
 # @TODO: Print the `inexpensive_loans` list
-print("The following loans are priced at under $500.")
+print("The following loans are priced at under $500:")
 loan_number = 1
 for loan in inexpensive_loans:
     if loan["repayment_interval"] == "bullet":
@@ -250,4 +254,8 @@ output_path = Path("inexpensive_loans.csv")
 
 # @TODO: Use the csv library and `csv.writer` to write the header row
 # and each row of `loan.values()` from the `inexpensive_loans` list.
-# YOUR CODE HERE!
+with open(output_path, 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerow(header)
+    for row in inexpensive_loans:
+        csvwriter.writerow(row.values())
