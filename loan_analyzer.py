@@ -2,6 +2,16 @@
 import csv
 from pathlib import Path
 
+
+
+
+#function to cut off digits below a penny from the number. This does not round up half cents, a feature which could be added to this function.
+
+def cut_less_than_pennies(dollar_amount_unrounded):
+    dollar_and_penny_rounded = ((dollar_amount_unrounded*10000)//100)/100
+    return dollar_and_penny_rounded
+
+
 """Part 1: Automate the Calculations.
 
 Automate the calculations for the loan portfolio summaries.
@@ -46,8 +56,11 @@ print("+ " + " "*((len(str(loan_amount_total)))-len(str(loan_costs[-1]))) + str(
 print("  " + "-" * len(str(loan_amount_total)))
 print("  " + str(loan_amount_total))
 
-print("\nThe total loan amount of " + str(loan_amount_total) + " divided by " + str(total_number_of_loans) + " loans = an average loan price of " + str(average_loan_price))
+print("\nThe total loan amount of $" + str(loan_amount_total) + " divided by " + str(total_number_of_loans) + " loans = an average loan price of $" + str(average_loan_price))
 
+
+
+print("\n" * 2)      #some line breaks before part two
 
 
 
@@ -84,21 +97,32 @@ loan = {
 
 # @TODO: Use get() on the dictionary of additional information to extract the Future Value and Remaining Months on the loan.
 # Print each variable.
-# YOUR CODE HERE!
 
+future_value = loan.get("future_value")
+print(future_value)
 
 # @TODO: Use the formula for Present Value to calculate a "fair value" of the loan.
 # Use a minimum required return of 20% as the discount rate.
 #   You'll want to use the **monthly** version of the present value formula.
 #   HINT: Present Value = Future Value / (1 + Discount_Rate/12) ** remaining_months
 
-# YOUR CODE HERE!
+remaining_months = loan.get("remaining_months")
+print(remaining_months)
 
 # If Present Value represents what the loan is really worth, does it make sense to buy the loan at its cost?
 # @TODO: Write a conditional statement (an if-else statement) to decide if the present value represents the loan's fair value.
 #    If the present value of the loan is greater than or equal to the cost, then print a message that says the loan is worth at least the cost to buy it.
 #    Else, the present value of the loan is less than the loan cost, then print a message that says that the loan is too expensive and not worth the price.
-# YOUR CODE HERE!
+
+required_annual_return_rate = .2
+present_value = future_value / (1+required_annual_return_rate/12)**remaining_months
+present_value = cut_less_than_pennies(present_value)
+print(present_value)
+
+if loan["loan_price"] <= present_value:
+    print("This loan is worth at least the cost to buy it if we assume we will be repaid. We are lending $" + str(loan["loan_price"]) + " with an expectation that the present value of the future repayment is $" + str(present_value) + ".")
+else:
+    print("This loan is not worth the price of $" + str(loan["loan_price"]) + " because even if we do get repaid the present value of the future payment is $" + str(present_value) + ".")
 
 
 """Part 3: Perform Financial Calculations.
