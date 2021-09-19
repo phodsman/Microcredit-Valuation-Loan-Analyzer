@@ -2,14 +2,23 @@
 import csv
 from pathlib import Path
 
+##A few functions are defined here to aid in ease of presentation of numbers in string output.
 
 
+#This function takes a money amount parameter and rounds it to the penny, and also prints zeros for the pennies place if there are no pennies or an end zero if there are only dimes, and adds a leading dollar sign. The output is returned as a string.
 
-#function to cut off digits below a penny from the number. This does not round up half cents, a feature which could be added to this function.
+def penny_format(unformatted_amount):
+    penny_rounded_format = "${:.2f}".format(round(unformatted_amount, 2))
+    return penny_rounded_format
 
-def cut_less_than_pennies(dollar_amount_unrounded):
-    dollar_and_penny_rounded = ((dollar_amount_unrounded*10000)//100)/100
-    return dollar_and_penny_rounded
+#this function takes a plain decimal format and converts it to a string in percent format, multiplied by a hundred with a percent sign. It removes trailing zeros after a decimal.
+
+def percent_format(decimal_format):
+    percent = decimal_format * 100
+    if (percent * 100) % 1 == 0:
+        percent = int(percent)
+    percent_formatted = str(percent) + "%"
+    return percent_formatted
 
 
 """Part 1: Automate the Calculations.
@@ -22,45 +31,43 @@ First, let's start with some calculations on a list of prices for 5 loans.
     3. Using the sum of all loans and the total number of loans, calculate the average loan price.
     4. Print all calculations with descriptive messages.
 """
+
+print("Part 1: Automate the Calculations.\n")
+
 loan_costs = [500, 600, 200, 1000, 450]
 
 # How many loans are in the list?
 # @TODO: Use the `len` function to calculate the total number of loans in the list.
 # Print the number of loans from the list
 total_number_of_loans = len(loan_costs)
-print(total_number_of_loans)
+print(f"There are {total_number_of_loans} loans.")
 
 
 # What is the total of all loans?
 # @TODO: Use the `sum` function to calculate the total of all loans in the list.
 # Print the total value of the loans
 loan_amount_total = sum(loan_costs)
-print(loan_amount_total)
+print(f"There total amount of the loans is {penny_format(loan_amount_total)}.")
 
 # What is the average loan amount from the list?
 # @TODO: Using the sum of all loans and the total number of loans, calculate the average loan price.
 # Print the average loan amount
 average_loan_price = loan_amount_total / total_number_of_loans
-print(average_loan_price)
-
-print("\n\n")  #separating above exercise from the following
+print(f"The average loan price is {penny_format(average_loan_price)}.\n")
 
 #This code prints the previous calculations with descriptive messages and formats it to look like a normal accounting equation.
-print("The sum of the", total_number_of_loans, "loans:\n\n")
+print(f"The sum of the {total_number_of_loans} loans:\n")
 
 #code to add spaces at the beginning so the right side lines up and a plus sign appears before the bottom horizontal line. I should make a general function for this.
 for loan in loan_costs[:-1]: 
-    print("  " + " "*((len(str(loan_amount_total)))-len(str(loan))) + str(loan))
-print("+ " + " "*((len(str(loan_amount_total)))-len(str(loan_costs[-1]))) + str(loan_costs[-1]))
+    print("  " + " "*((len(penny_format(loan_amount_total)))-len(penny_format(loan))) + penny_format(loan))
+print("+ " + " "*((len(penny_format(loan_amount_total)))-len(penny_format(loan_costs[-1]))) + penny_format(loan_costs[-1]))
 
-print("  " + "-" * len(str(loan_amount_total)))
-print("  " + str(loan_amount_total))
+print("  " + "-" * len(penny_format(loan_amount_total)))
+print("  " + penny_format(loan_amount_total))
 
-print("\nThe total loan amount of $" + str(loan_amount_total) + " divided by " + str(total_number_of_loans) + " loans = an average loan price of $" + str(average_loan_price))
+print(f"\nThe total loan amount of {penny_format(loan_amount_total)} divided by {total_number_of_loans} loans equals an average loan price of {penny_format(average_loan_price)}.\n")
 
-
-
-print("\n" * 2)      #some line breaks before part two
 
 
 
@@ -95,34 +102,33 @@ loan = {
     "future_value": 1000,
 }
 
+print("Part 2: Analyze Loan Data.\n")
+
 # @TODO: Use get() on the dictionary of additional information to extract the Future Value and Remaining Months on the loan.
 # Print each variable.
 
 future_value = loan.get("future_value")
-print(future_value)
+remaining_months = loan.get("remaining_months")
+print(f"The future value of the loan is {penny_format(future_value)} when the loan matures {remaining_months} from now.")
+
 
 # @TODO: Use the formula for Present Value to calculate a "fair value" of the loan.
 # Use a minimum required return of 20% as the discount rate.
 #   You'll want to use the **monthly** version of the present value formula.
 #   HINT: Present Value = Future Value / (1 + Discount_Rate/12) ** remaining_months
 
-remaining_months = loan.get("remaining_months")
-print(remaining_months)
+discount_rate = .2
+present_value = future_value / (1+discount_rate/12)**remaining_months
 
 # If Present Value represents what the loan is really worth, does it make sense to buy the loan at its cost?
 # @TODO: Write a conditional statement (an if-else statement) to decide if the present value represents the loan's fair value.
 #    If the present value of the loan is greater than or equal to the cost, then print a message that says the loan is worth at least the cost to buy it.
 #    Else, the present value of the loan is less than the loan cost, then print a message that says that the loan is too expensive and not worth the price.
 
-required_annual_return_rate = .2
-present_value = future_value / (1+required_annual_return_rate/12)**remaining_months
-present_value = cut_less_than_pennies(present_value)
-print(present_value)
-
 if loan["loan_price"] <= present_value:
-    print("This loan is worth at least the cost to buy it if we assume we will be repaid. We are lending $" + str(loan["loan_price"]) + " with an expectation that the present value of the future repayment is $" + str(present_value) + ".")
+    print(f"This loan is worth at least the cost to buy it if we assume we will be repaid. We are lending " + penny_format(loan["loan_price"]) + f" with an expectation that the present value of the future repayment with a discount rate of " + percent_format(discount_rate) + f" is {penny_format(present_value)}.\n")
 else:
-    print("This loan is not worth the price of $" + str(loan["loan_price"]) + " because even if we do get repaid the present value of the future payment is $" + str(present_value) + ".")
+    print(f"This loan is not worth the price of " + penny_format(loan["loan_price"]) + f" because even if we do get repaid the present value of the future payment at a discount rate of " + percent_format(discount_rate) + " is {penny_format(present_value)}.\n")
 
 
 """Part 3: Perform Financial Calculations.
@@ -136,6 +142,8 @@ Perform financial calculations using functions.
     a. Use an `annual_discount_rate` of 0.2 for this new loan calculation.
 """
 
+print("Part 3: Perform Financial Calculations.\n")
+
 # Given the following loan data, you will need to calculate the present value for the loan
 new_loan = {
     "loan_price": 800,
@@ -147,13 +155,19 @@ new_loan = {
 # @TODO: Define a new function that will be used to calculate present value.
 #    This function should include parameters for `future_value`, `remaining_months`, and the `annual_discount_rate`
 #    The function should return the `present_value` for the loan.
-# YOUR CODE HERE!
-
+def calculate_present_value(future_value, remaining_months, annual_discount_rate):
+    present_value = future_value / (1+discount_rate/12)**remaining_months
+    return present_value
 
 # @TODO: Use the function to calculate the present value of the new loan given below.
 #    Use an `annual_discount_rate` of 0.2 for this new loan calculation.
-# YOUR CODE HERE!
-print(f"The present value of the loan is: {present_value}")
+
+annual_discount_rate = .2
+
+present_value = calculate_present_value(new_loan["future_value"], new_loan["remaining_months"], annual_discount_rate)
+
+print(f"The present value of the loan of " + penny_format(new_loan["loan_price"]) +" which matures in " + str(new_loan["remaining_months"]) + f" months is: {penny_format(present_value)}\n")
+
 
 
 """Part 4: Conditionally filter lists of loans.
@@ -166,6 +180,8 @@ In this section, you will use a loop to iterate through a series of loans and se
     b. If the loan_price is less than 500 then append that loan to the `inexpensive_loans` list.
 3. Print the list of inexpensive_loans.
 """
+
+print("Part 4: Conditionally filter lists of loans.\n")
 
 loans = [
     {
@@ -195,14 +211,22 @@ loans = [
 ]
 
 # @TODO: Create an empty list called `inexpensive_loans`
-# YOUR CODE HERE!
+inexpensive_loans = []
 
 # @TODO: Loop through all the loans and append any that cost $500 or less to the `inexpensive_loans` list
-# YOUR CODE HERE!
+for loan in loans:
+    if loan["loan_price"] <= 500:
+        inexpensive_loans.append(loan)
 
 # @TODO: Print the `inexpensive_loans` list
-# YOUR CODE HERE!
-
+print("The following loans are priced at under $500.")
+loan_number = 1
+for loan in inexpensive_loans:
+    if loan["repayment_interval"] == "bullet":
+        print(f"{loan_number}. A loan for " + penny_format(loan["loan_price"]) + " maturing in " + str(loan["remaining_months"]) + " months with a future value of " + penny_format(loan["future_value"]) + " to be paid in full at maturity.")
+    elif loan["repayment_interval"] == "monthly":
+        print(f"{loan_number}. A loan for " + penny_format(loan["loan_price"]) + " maturing in " + str(loan["remaining_months"]) + " months with a future value of " + penny_format(loan["future_value"]) + " to be paid monthly.")
+    loan_number+=1
 
 """Part 5: Save the results.
 
