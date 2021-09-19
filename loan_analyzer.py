@@ -109,7 +109,7 @@ print("Part 2: Analyze Loan Data.\n")
 
 future_value = loan.get("future_value")
 remaining_months = loan.get("remaining_months")
-print(f"The future value of the loan is {penny_format(future_value)} when the loan matures {remaining_months} from now.")
+print(f"The future value of the loan is {penny_format(future_value)} when the loan matures {remaining_months} months from now.")
 
 
 # @TODO: Use the formula for Present Value to calculate a "fair value" of the loan.
@@ -166,7 +166,7 @@ annual_discount_rate = .2
 
 present_value = calculate_present_value(new_loan["future_value"], new_loan["remaining_months"], annual_discount_rate)
 
-print(f"The present value of the loan of " + penny_format(new_loan["loan_price"]) +" which matures in " + str(new_loan["remaining_months"]) + f" months is: {penny_format(present_value)}\n")
+print(f"The present value of the loan of " + penny_format(new_loan["loan_price"]) +" which matures in " + str(new_loan["remaining_months"]) + f" months with a discount rate of {percent_format(annual_discount_rate)} is: {penny_format(present_value)}\n")
 
 
 
