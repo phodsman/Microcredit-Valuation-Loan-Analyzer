@@ -1,2 +1,2 @@
-# Module-1-Challenge-Microcredit-Valuation
-Module 1 Challenge for the UCB Fintech Bootcamp
+# Microcredit Valuation Loan Analyzer
+Analyzes a data set of available loans to filter profitable loans based on present value calculation.
